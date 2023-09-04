@@ -1,0 +1,210 @@
+from selenium import webdriver
+
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+
+from webdriver_manager.chrome import ChromeDriverManager
+
+import time
+
+customService = Service(ChromeDriverManager().install())  #자동설치 업데이트 되는 크롬드라이버선택
+customOption = Options()
+
+# 어떤 크롬드라이브를 쓸것인지 webdriver.Chrome(./'chromedriver.exe') '기본표현', './'는 하위폴더 위치
+browser = webdriver.Chrome(service = customService, options = customOption)
+
+# 드라이버를 이용하여, 브라우저 실행.
+URL = 'https://itemscout.io/'
+browser.get(URL)
+browser.implicitly_wait(10)
+
+# 아이템스카우트 접속해서 팝업창 끄기
+# '//' 지금 위치에서 모든 하위 모든 문서 서칭, '*' 모든 속성 태그중에서 '[@]' 'app'속성중에서
+browser.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/div[2]/div[4]/a').click()
+browser.find_element(By.XPATH, '//*[@id="app"]/div/header/div/div[4]/a/span/div').click()
+browser.implicitly_wait(10)
+
+# 아이디 입력
+browser.find_element(By.XPATH, '//*[@id="input-185"]').click()
+browser.find_element(By.XPATH, '//*[@id="input-185"]').send_keys("chj9953@naver.com")
+# 비밀번호 입력
+browser.find_element(By.XPATH, '//*[@id="input-187"]').click()
+browser.find_element(By.XPATH, '//*[@id="input-187"]').send_keys("cv21852185##")
+# 로그인 버튼 누르기
+browser.find_element(By.XPATH, '//*[@id="app"]/div/main/div/div/div/div/button[2]/span').click()
+time.sleep(5)
+
+# 아이템발굴 클릭
+browser.find_element(By.XPATH, '//*[@id="app"]/div/header/div/div[2]/a[1]/span').click()
+
+# 튜토리얼 팝업창 끄기
+browser.find_element(By.XPATH, '//*[@id="tutorialTooltip"]/div[2]/button/span/i').click()
+
+# # 1차 카테고리 아래 화살표 클릭, 패션의류 클릭해서 필터창 나오게 하기
+browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[1]/div[1]').click()
+time.sleep(3)
+browser.find_element(By.XPATH, '//*[@id="category-header"]/div[3]/div/div/div[1]').click()
+
+# #필터 선택, 중소형 필터선택
+# browser.find_element(By.XPATH, '//*[@id="app"]/div/main/div/div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/div/div/div/span').click()
+# # '중소형키워드' XPATH로 경로찾기가 어려워서, '클래스네임'속성값으로 특정함.
+# browser.find_element(By.CLASS_NAME, 'filter-title-wrapper').click()
+# time.sleep(2) # 다음 코드가 진행이 안되어서, 타임슬립 넣어봤더니 진행됨.
+
+#필터 선택, 중소형 필터선택
+browser.find_element(By.XPATH, '//*[@id="app"]/div/main/div/div/div/div[2]/div[1]/div/div[2]/div[1]/div[1]/div/div/div/span').click()
+# '중소형키워드' XPATH로 경로찾기가 어려워서, 'full xpath'로 특정함.
+browser.find_element(By.XPATH, '/html/body/div[4]/div/div[1]/div[1]/div[3]/div/div[1]').click()
+time.sleep(2) # 다음 코드가 진행이 안되어서, 타임슬립 넣어봤더니 진행됨.
+
+##################################액스패스가 바뀌어 1차카테고리 첫번째만 수기입력######################################################
+browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[1]/div[1]').click() #1차 화살표 클릭
+time.sleep(2)
+browser.find_element(By.XPATH, '//*[@id="category-header"]/div[3]/div/div/div[2]').click() #첫번째 메뉴 선택
+time.sleep(2)    
+first_catergory = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[1]/div[1]').text #선택된 카테고리 창 텍스트 긁기
+browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 클릭
+time.sleep(2)            
+browser.find_element(By.XPATH, '//*[@id="category-header"]/div[4]/div/div/div[1]').click() # 두번째 카테고리 첫번째 메뉴 선택
+time.sleep(2)
+for a in range (1,3) :
+    if a == 1 :  # 3차 카테고리도 첫번째 try 하는순간 엑스패스가 기존이랑 다른데, 이번에는 if문을 사용해서 첫번째것만 따로 실행
+        try :
+            # 최초 값 설정이후 첫번째 선택지는 '선택안함이므로' 건너띄고 선택한다.
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 재클릭
+            time.sleep(2)            
+            browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{a+1}]').click() # '선택안함' 제외하고 두번째 메뉴 선택
+            time.sleep(2)
+            second_category = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').text # 선택된 2차 카테고리 실행창 텍스트 긁기
+            time.sleep(2)
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').click() # 3차 화살표 클릭
+            time.sleep(2)
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[4]/div/div/div[1]').click() # 3차 첫번째 메뉴 선택, #엑스패스값 특이
+            time.sleep(2)
+        except Exception :
+            continue
+    else :
+        try :
+            # 최초 값 설정이후 첫번째 선택지는 '선택안함이므로' 건너띄고 선택한다.
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 재클릭
+            time.sleep(2)            
+            browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{a+1}]').click() # '선택안함' 제외하고 두번째 메뉴 선택
+            time.sleep(2)
+            second_category = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').text # 선택된 2차 카테고리 실행창 텍스트 긁기
+            time.sleep(2)
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').click() # 3차 화살표 클릭
+            time.sleep(2)
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[3]/div/div/div[1]').click() # 3차 첫번째 메뉴 선택, #엑스패스값 특이
+            time.sleep(2)
+        except Exception :
+            continue
+    for b in range(1,3) :
+        try :
+            # 스크룰바 맨위로 올리기
+            browser.execute_script("window.scrollTo(document.body.scrollHeight,0)")
+            time.sleep(2)
+            browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').click() # 3차 화살표 재클릭
+            time.sleep(2)
+            browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{b+1}]').click() # '선택안함' 제외하고 두번째 메뉴 선택
+            time.sleep(2)
+            third_category = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').text # 선택된 2차 카테고리 실행창 텍스트 긁기
+            time.sleep(2)
+            print(first_catergory, '/', second_category, '/', third_category)
+            while True :
+                new_height = browser.execute_script("return document.body.scrollHeight") # 현재 페이지 높이
+                # 스크룰 끝까지 내리기
+                browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+                # 로딩 대기
+                time.sleep(2)   
+                # 내리고난 값을 last_height로 업데이트
+                last_height = browser.execute_script("return document.body.scrollHeight")
+                # 만약 처음 스크롤 높이 값과, 내리고 난 뒤 스크롤 높이 값이 같으면, 멈춰라 아니면 다시 위로 올라가서 실행
+                if new_height == last_height:
+                    break                
+#                 last_height = new_height
+        except Exception :
+            continue        
+    print('-----구분선-----')
+
+####################################그 다음부터는 동일한 규칙으로 이동####################################################
+for i in range (3,12) : # 1차 카테고리 처음부터 끝까지 검색, 아이템 스카우트 특성상 1차카테고리 '선택안함' 제외하고 다음부터 클릭
+    # 스크룰바 맨위로 올리기
+    browser.execute_script("window.scrollTo(document.body.scrollHeight,0)")
+    time.sleep(3)
+    browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[1]/div[1]').click() #1차 화살표 클릭
+    time.sleep(2)
+    browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{i}]').click() # 'i'번째 메뉴 선택
+    time.sleep(2)    
+    # 첫번재 카테고리 출력하기, 엑스패스 {i}사용하려고했으나 에러가생겨서, 실행한 실행창 텍스트 엑스패스를 긁어옴
+    first_catergory = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[1]/div[1]').text  
+    # 두번째 카테고리 첫번째 선택지 임의로 선택 / 아이템스카우트는 두번째 카테고리 첫번째 선택지 임의로 선택하면 그 다음 두번째~
+    # 카테고리 내 선택지 div값이 변동됨 희한함...
+    browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 클릭
+    time.sleep(2)            
+    browser.find_element(By.XPATH, '//*[@id="category-header"]/div[3]/div/div/div[1]').click() # 2차 화살표 첫번재 메뉴 선택
+    time.sleep(2)
+    for j in range (1,3) :
+        if j == 1 :  # 3차 카테고리 첫번째 try 하는순간 엑스패스가 기존이랑 다름, 이번에도 if문을 사용해서 첫번째것만 따로 실행
+            try :
+                # 최초 값 설정이후 첫번째 선택지는 '선택안함이므로' 건너띄고 선택한다.
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 재클릭
+                time.sleep(2)            
+                browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{j+1}]').click() # '선택안함' 제외하고 두번째 메뉴 선택
+                time.sleep(2)
+                second_category = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').text # 선택된 2차 카테고리 실행창 텍스트 긁기
+                time.sleep(2)
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').click() # 3차 화살표 클릭
+                time.sleep(2)
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[4]/div/div/div[1]').click() # 3차 첫번째 메뉴 선택, #엑스패스값 특이
+                time.sleep(2)
+            except Exception :
+                continue
+        else :
+            try :
+                # 최초 값 설정이후 첫번째 선택지는 '선택안함이므로' 건너띄고 선택한다.
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 재클릭
+                time.sleep(2)            
+                browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{j+1}]').click() # '선택안함' 제외하고 두번째 메뉴 선택
+                time.sleep(2)
+                second_category = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').text # 선택된 2차 카테고리 실행창 텍스트 긁기
+                time.sleep(2)
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').click() # 3차 화살표 클릭
+                time.sleep(2)
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[3]/div/div/div[1]').click() # 3차 첫번째 메뉴 선택, #엑스패스값 특이
+                time.sleep(2)
+            except Exception :
+                continue
+        for k in range(1,3) :
+            try :
+                # 스크룰바 맨위로 올리기
+                browser.execute_script("window.scrollTo(document.body.scrollHeight,0)")
+                time.sleep(2)
+                browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').click() # 3차 화살표 재클릭
+                time.sleep(2)
+                browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[3]/div/div/div[{k+1}]').click() # '선택안함' 제외하고 두번째 메뉴 선택
+                time.sleep(2)
+                third_category = browser.find_element(By.XPATH, '//*[@id="category-header"]/div[1]/div[2]/div/div[3]/div[1]').text # 선택된 2차 카테고리 실행창 텍스트 긁기
+                time.sleep(2)
+                print(first_catergory, '/', second_category, '/', third_category)
+                while True :
+                    new_height = browser.execute_script("return document.body.scrollHeight") # 현재 페이지 높이
+                    # 스크룰 끝까지 내리기
+                    browser.execute_script("window.scrollTo(0, document.body.scrollHeight)")
+                    # 로딩 대기
+                    time.sleep(2)   
+                    # 내리고난 값을 last_height로 업데이트
+                    last_height = browser.execute_script("return document.body.scrollHeight")
+                    # 만약 처음 스크롤 높이 값과, 내리고 난 뒤 스크롤 높이 값이 같으면, 멈춰라 아니면 다시 위로 올라가서 실행
+                    if new_height == last_height:
+                        break
+                    last_height = new_height
+            except Exception :
+                continue        
+        print('-----구분선-----')
+
+
+        
+    
