@@ -1,4 +1,13 @@
 # ####################################카테고리####################################################
+# element(단일) , elements(복수)	설명
+# By.ID	태그의 id값으로 추출
+# By.NAME	태그의 name값으로 추출
+# By.XPATH	태그의 경로로 추출
+# By.LINK_TEXT	링크 텍스트값으로 추출
+# By.PARTIAL_LINK_TEXT	링크 텍스트의 자식 텍스트 값을 추출
+# By.TAG_NAME	태그 이름으로 추출
+# By.CLASS_NAME	태그의 클래스명으로 추출
+# By.CSS_SELECTOR	css선택자로 추출
 class1 = ['','선택안함','패션의류','패션잡화','화장품/미용',
          '디지털/가전','가구/인테리어','출산/육아','식품',
          '스포츠/레저','생활/건강','여가/생활편의']
@@ -6,14 +15,14 @@ fashion_cloth_class2 = ['', '선택안함', '여성의류','여성언더웨어/�
                         '남성언더웨어/잠옷'] 
 fashion_goods_class2 = ['','선택안함','양말','여성신발','남성신발','신발용품','여성가방',
                         '남성가방','여행용가방/소품','지갑','벨트','모자','장갑',
-                        '선글라스/안경태','헤어엑서서리','패션소품','시계','순금']
+                        '선글라스/안경테','헤어액세서리','패션소품','시계','순금']
 cosmetic_beauty_class2 = ['','선택안함','스킨케어','선케어','클렌징','마스크/팩','베이스메이크업',
                           '색조메이크업','네일케어','바디케어','헤어케어','헤어스타일링','향수',
                           '뷰티소품','남성화장품']
-digital_home_appliances_class2 = ['','선택안함','학습기기','게임기/타이틀','PC','PC엑세서리','노트북엑세서리',
-                                  '태블릿PC엑세서리','모니터주변기기','주변기기','멀티미디어장비',
+digital_home_appliances_class2 = ['','선택안함','학습기기','게임기/타이틀','PC','PC액세서리','노트북액세서리',
+                                  '태블릿PC액세서리','모니터주변기기','주변기기','멀티미디어장비',
                                   '저장장치','PC부품','네트워크장비','소프트웨어','노트북','태블릿PC',
-                                  '모니터','휴대폰','휴대폰엑세서리','카메라/캠코더용품','광학기기.용품',
+                                  '모니터','휴대폰','휴대폰액세서리','카메라/캠코더용품','광학기기/용품',
                                   '영상가전','음향가전','생활가전','이미용가전','계절가전','주방가전',
                                  '자동차기기']
 
@@ -35,7 +44,7 @@ food_class2 = ['','선택안함','건강식품','다이어트식품','냉동/간
 sports_class2 = ['','선택안함', '마라톤용품','당구용품','기타스포츠용품','등산','캠핑','골프','헬스',
                  '요가/필라테스','인라인스케이트','스케이트/보드/롤러','오토바이/스쿠터','축구','야구',
                  '농구','배구','탁구','배드민턴','테니스','스쿼시','족구','볼링','스킨스쿠버','검도',
-                 '댄스','권투','보호용품','무술용품','수련용품','스포츠엑세서리','자전거','스키/보드',
+                 '댄스','권투','보호용품','무술용품','수련용품','스포츠액세서리','자전거','스키/보드',
                  '낚시','수영']
 health_class2 = ['','선택안함','화방용품','자동차용품','수집품','관상어용품','음반','DVD','종교','주방용품',
                  '세탁용품','건강측정용품','건강관리용품','당뇨관리용품','의료용품','실버용품','재활운동용품',
@@ -48,6 +57,7 @@ class2 = ['', fashion_cloth_class2, fashion_goods_class2, cosmetic_beauty_class2
          furniture_class2, parenting_class2, food_class2, sports_class2, health_class2, leisure_class2]
 class2[0]
 
+
 # ####################################반복문 시작####################################################
 
 from selenium import webdriver
@@ -58,6 +68,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 from webdriver_manager.chrome import ChromeDriverManager
 
@@ -91,16 +103,18 @@ action = ActionChains(browser)
 
 # 아이템스카우트 접속해서 팝업창 끄기
 # '//' 지금 위치에서 모든 하위 모든 문서 서칭, '*' 모든 속성 태그중에서 '[@]' 'app'속성중에서
-browser.find_element(By.XPATH, '//*[@id="app"]/div/div[1]/div/div[2]/div[4]/a').click()
+browser.find_element(By.LINK_TEXT,'7일간 보지 않기').click()
 browser.find_element(By.XPATH, '//*[@id="app"]/div/header/div/div[4]/a/span/div').click()
 browser.implicitly_wait(10)
 
-# 아이디 입력
-browser.find_element(By.XPATH, '//*[@id="input-189"]').click()
-browser.find_element(By.XPATH, '//*[@id="input-189"]').send_keys("chj9953@naver.com")
-# 비밀번호 입력
-browser.find_element(By.XPATH, '//*[@id="input-191"]').click()
-browser.find_element(By.XPATH, '//*[@id="input-191"]').send_keys("cv21852185##")
+# browser.find_element(By.CLASS_NAME, 'filter-title-wrapper').click()
+
+# 아이디 입력 (placeholder로 찾기)
+browser.find_element(By.CSS_SELECTOR, "div>input[placeholder='이메일']").click()
+browser.find_element(By.CSS_SELECTOR, "div>input[placeholder='이메일']").send_keys("chj9953@naver.com")
+# 비밀번호 입력 (placeholder로 찾기)
+browser.find_element(By.CSS_SELECTOR, "div>input[placeholder='비밀번호']").click()
+browser.find_element(By.CSS_SELECTOR, "div>input[placeholder='비밀번호']").send_keys("cv21852185##")
 # 로그인 버튼 누르기
 browser.find_element(By.XPATH, '//*[@id="app"]/div/main/div/div/div/div/button[2]/span').click()
 time.sleep(2)
@@ -109,7 +123,7 @@ time.sleep(2)
 browser.find_element(By.XPATH, '//*[@id="app"]/div/header/div/div[2]/a[1]/span').click()
 
 # 튜토리얼 팝업창 끄기
-browser.find_element(By.XPATH, '//*[@id="tutorialTooltip"]/div[4]/div[1]/a').click()
+browser.find_element(By.LINK_TEXT, '튜토리얼 닫기').click()
 # '//*[@id="tutorialTooltip"]/div[2]/button/span/i'
 
 # # 1차 카테고리 아래 화살표 클릭, 패션의류 클릭해서 필터창 나오게 하기
@@ -132,7 +146,7 @@ time.sleep(1) # 다음 코드가 진행이 안되어서, 타임슬립 넣어봤�
 
 ####################################그 다음(패션잡화)부터는 동일한 규칙으로 이동####################################################
 
-for i in range (2,10) : # 1차 카테고리 처음부터 끝까지 검색, 아이템 스카우트 특성상 1차카테고리 '선택안함' 제외하고 다음부터 클릭
+for i in range (2,11) : # 1차 카테고리 처음부터 끝까지 검색, 아이템 스카우트 특성상 1차카테고리 '선택안함' 제외하고 다음부터 클릭
     # 스크룰바 맨위로 올리기
     browser.execute_script("window.scrollTo(document.body.scrollHeight,0)")
     time.sleep(3)
@@ -153,7 +167,7 @@ for i in range (2,10) : # 1차 카테고리 처음부터 끝까지 검색, 아�
     else :
         TwoCate = 3 # 패션 잡화부터 쭉 2차 Xpath
     browser.find_element(By.XPATH, f'//*[@id="category-header"]/div[{TwoCate}]/div/div/div[1]').click() # 2차 화살표 첫번재 메뉴 선택 'or' 삽입
-    time.sleep(1)
+    time.sleep(2)
     for j in range (1,10) : #2차 카테고리
         if j == 1 :  # 엑스패스가 기존이랑 다름, 이번에도 if문을 사용해서 첫번째것만 따로 실행
             ThreeCate = 4
@@ -166,7 +180,7 @@ for i in range (2,10) : # 1차 카테고리 처음부터 끝까지 검색, 아�
             # 최초 값 설정이후 첫번째 선택지는 '선택안함이므로' 건너띄고 선택한다.
             browser.find_element(By.XPATH, 
                                  '//*[@id="category-header"]/div[1]/div[2]/div/div[2]/div[1]').click() # 2차 화살표 재클릭
-            time.sleep(2)            
+            time.sleep(3)            
             # 문제 있는 문장, 첫번째 반복만 실해되고 두번째 반복은 실행되지 않는다.
             
             try :
@@ -223,7 +237,7 @@ for i in range (2,10) : # 1차 카테고리 처음부터 끝까지 검색, 아�
             print(first_category, '/', second_category)     
             print('-----구분선-----')                
             break 
-        for k in range(4,26) : # 3차 카테고리
+        for k in range(20,26) : # 3차 카테고리
             try :
                 # 스크룰바 맨위로 올리기
                 browser.execute_script("window.scrollTo(document.body.scrollHeight,0)")
@@ -282,4 +296,40 @@ data = {'1차' : onecha,
         '경쟁강도' : competition
        }    
 df = pd.DataFrame(data)
-# df.to_excel('크롤링완료본.xlsx')
+df.to_excel('크롤링완료본.xlsx')
+time.sleep(10)
+
+excel_file_path = '크롤링완료본.xlsx'
+df_read = pd.read_excel(excel_file_path, engine='openpyxl')
+# 엑셀 파일에서 경로를 지정한다.
+
+word_except = '김치|나이키|내셔널지오|뉴발|다이소|디올|디스커버리|디즈니|대여|랄프로렌|루이비통|르꼬끄|레고|로로희|\
+망그러진곰|미니언즈|밀라노샵|메종키츠네|몽클레어|비비고|샤넬|슈프림|아디다스|이케아|이마트|에어포스|유니클로|에잇세컨즈|\
+자라|루피|조던|캉골|카카오|코스트코|코오롱|트레이더스|탑텐|퓨마|파타고니아|뽀로로|-'
+filtered_df = df_read[~df_read['상품명'].str.contains('[a-zA-Z]')&~df_read['상품명'].str.contains('[0-9]')
+                      &~df_read['상품명'].str.contains(word_except)]
+# 상품명 열에서 영문,숫자 워드익셉트가 들어간것은 제외시킨다. 
+
+filtered_df.to_excel('크롤링완료본_영어_브랜드 제외.xlsx')
+# 수정한것을 다시 저장,
+
+
+##################################### Top 40 6개월 매출 검색하기
+
+
+browser.find_element(By.XPATH, 
+                     '//*[@id="app"]/div/header/div/div[2]/a[2]/span').click() # 키워드 분석 클릭
+time.sleep(3)
+
+for i in range(1,10) :
+    browser.find_element(By.CLASS_NAME,'keyword-search-input').click()
+    k = rank_key.loc[i,'상품명']
+    browser.find_element(By.CLASS_NAME,'keyword-search-input').send_keys(k) # 순차 입력
+    browser.find_element(By.CLASS_NAME,'keyword-search-input').send_keys(Keys.ENTER) # 검색버튼 클릭
+    time.sleep(2)
+    sales = browser.find_element(By.XPATH,
+                                 '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]').text # 매출긁어오기
+    print(k,sales)
+    search_box = browser.find_element(By.XPATH,'//input') 
+    search_box.clear()
+    time.sleep(2)
