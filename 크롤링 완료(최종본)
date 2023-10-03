@@ -315,21 +315,47 @@ filtered_df.to_excel('크롤링완료본_영어_브랜드 제외.xlsx')
 
 
 ##################################### Top 40 6개월 매출 검색하기
+# 확장프로그램 수기로 설치하고 다시돌린다.
+
+config_name = []
+sales = []
+rank_key = pd.read_excel('크롤링완료본_영어_브랜드 제외.xlsx')
+# 엑셀 파일에서 경로를 지정한다.
+
 
 
 browser.find_element(By.XPATH, 
                      '//*[@id="app"]/div/header/div/div[2]/a[2]/span').click() # 키워드 분석 클릭
 time.sleep(3)
 
-for i in range(1,10) :
+
+for i in range(0,20) :
     browser.find_element(By.CLASS_NAME,'keyword-search-input').click()
     k = rank_key.loc[i,'상품명']
+    config_name.append(k)
     browser.find_element(By.CLASS_NAME,'keyword-search-input').send_keys(k) # 순차 입력
     browser.find_element(By.CLASS_NAME,'keyword-search-input').send_keys(Keys.ENTER) # 검색버튼 클릭
-    time.sleep(2)
-    sales = browser.find_element(By.XPATH,
-                                 '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]').text # 매출긁어오기
-    print(k,sales)
+    pause = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.XPATH,
+                                                                             '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]')))
+    time.sleep(1)
+
+    product_sale = browser.find_element(By.XPATH,
+                                        '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]').text
+#     time.sleep(1)
+    sales.append(browser.find_element(By.XPATH,
+                                      '//*[@id="app"]/div/main/div/div/div/div/div[1]/div[2]/div/div[2]/div[1]/div[1]/div[2]/div[1]/div[2]/div[2]').text) # 매출긁어오기
+    print(k,product_sale)
     search_box = browser.find_element(By.XPATH,'//input') 
     search_box.clear()
-    time.sleep(2)
+#     time.sleep(2)
+
+
+sales
+
+sales_data = {'재확인' : config_name,
+              'top40매출' : sales }
+
+sales_df = pd.DataFrame(sales_data)
+
+New_df = pd.concat([rank_key, sales_df], axis=1)
+New_df
